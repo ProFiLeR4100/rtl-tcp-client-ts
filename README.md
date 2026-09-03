@@ -22,7 +22,7 @@ import { RtlSdrClient } from 'rtl-tcp-client';
 const client = new RtlSdrClient({ host: '127.0.0.1', port: 1234, chunkSize: 8192 });
 
 client.on('samples', (iq: Int16Array) => {
-  // iq is interleaved [I0, Q0, I1, Q1, ...]
+	// iq is interleaved [I0, Q0, I1, Q1, ...]
 });
 client.on('error', (e) => console.error(e));
 client.on('disconnect', () => console.log('disconnected'));
@@ -30,11 +30,11 @@ client.on('disconnect', () => console.log('disconnected'));
 await client.connect();
 console.log('tuner:', client.tunerName);
 await client.configure({
-  centerFrequency: 100_000_000,
-  sampleRate: 2_048_000,
-  autoGain: false,
-  gainDb: 30,
-  freqCorrectionPpm: 0,
+	centerFrequency: 100_000_000,
+	sampleRate: 2_048_000,
+	autoGain: false,
+	gainDb: 30,
+	freqCorrectionPpm: 0
 });
 ```
 
@@ -62,6 +62,7 @@ await client.configure({
 ```bash
 npm test
 ```
+
 Tests run against an in-process mock `rtl_tcp` server (no hardware required).
 
 ### Integration test (real hardware)
@@ -87,6 +88,7 @@ set RTL_TCP_HOST=10.0.0.5 && set RTL_TCP_PORT=1234 && npm run test:integration
 The test handshakes with the server, applies frequency/sample-rate/AGC settings, and asserts that live, non-flat IQ samples arrive. The upstream server serves **one client at a time** — close SDR#/GQRX/other consumers before running it.
 
 ## Notes / limitations
+
 - The upstream server serves **one client at a time**; after a disconnect it returns to listening.
 - If you fall behind, the server drops oldest buffers; this client also caps its buffer (`maxPendingSamples`) and emits `drop`.
 - At the default 2.048 MHz sample rate the stream is ~8 MiB/s; lower `sampleRate` for bandwidth-limited use.
