@@ -5,20 +5,36 @@
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist"],
-  "engines": { "node": ">=16" },
-  "keywords": ["rtl-sdr", "rtl_tcp", "rtl-sdr-blog", "sdr", "software-defined-radio", "rtlsdr"],
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=16"
+  },
+  "keywords": [
+    "rtl-sdr",
+    "rtl_tcp",
+    "rtl-sdr-blog",
+    "sdr",
+    "software-defined-radio",
+    "rtlsdr"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
     "test": "vitest run test/client.test.ts",
     "test:watch": "vitest",
     "test:integration": "vitest run test/integration.test.ts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "prepublishOnly": "npm run clean && npm run build"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^20.14.15",
+    "eslint": "^10.9.1",
     "typescript": "^5.5.4",
+    "typescript-eslint": "^8.69.0",
     "vitest": "^2.1.9"
   }
 }
