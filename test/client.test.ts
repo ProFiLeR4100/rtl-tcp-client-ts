@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { RtlSdrClient } from '../src/index';
 import { encodeIq } from '../src/protocol';
 import { MockRtlTcpServer } from './helpers/mockServer';

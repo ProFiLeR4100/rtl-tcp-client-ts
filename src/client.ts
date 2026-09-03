@@ -1,7 +1,7 @@
 import { EventEmitter } from 'node:events';
 import * as net from 'node:net';
 import { COMMANDS, DEFAULT_HOST, DEFAULT_PORT, HANDSHAKE_SIZE, TUNER_NAMES } from './constants';
-import { decodeIq, encodeCommand, parseHandshake, type Handshake } from './protocol';
+import { type Handshake, decodeIq, encodeCommand, parseHandshake } from './protocol';
 
 export interface RtlSdrClientOptions {
 	host?: string;
