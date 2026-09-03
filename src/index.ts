@@ -1,5 +1,5 @@
 /**
- * Публичный API библиотеки: точка входа для всех экспортов.
+ * Public API of the library: single entry point for all exports.
  */
 export { RtlSdrClient } from './client';
 export type { RtlSdrClientOptions, ConfigureOptions } from './client';
