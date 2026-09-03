@@ -189,5 +189,3 @@ testem.log
 .DS_Store
 Thumbs.db
 
-# rtl-sdr-blog server sources (for local analysis)
-rtl-sdr-blog-master
