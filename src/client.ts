@@ -156,6 +156,7 @@ export class RtlSdrClient extends EventEmitter {
 		if (this._state === 'stream') {
 			return Promise.resolve(this);
 		}
+
 		// A socket already exists (connect in progress) — don't start another.
 		if (this._socket) {
 			return Promise.reject(new Error('A connection is already in progress or established.'));
@@ -166,6 +167,7 @@ export class RtlSdrClient extends EventEmitter {
 			port: this._port,
 			timeout: this._connectTimeoutMs
 		});
+
 		this._socket = socket;
 		this._state = 'handshake';
 
@@ -196,6 +198,7 @@ export class RtlSdrClient extends EventEmitter {
 		const socket = this._socket;
 		this._state = 'idle';
 		this._rx = Buffer.alloc(0);
+
 		if (socket && !socket.destroyed) {
 			// Wait for the real close so the promise settles deterministically.
 			await new Promise<void>((resolve) => {
@@ -311,12 +314,15 @@ export class RtlSdrClient extends EventEmitter {
 		if (opts.centerFrequency != null) {
 			await this.setCenterFrequency(opts.centerFrequency);
 		}
+
 		if (opts.sampleRate != null) {
 			await this.setSampleRate(opts.sampleRate);
 		}
+
 		// Gain value only makes sense after the mode (auto/manual) is set.
 		if (opts.autoGain != null) {
 			await this.setGainMode(opts.autoGain);
+
 			if (!opts.autoGain && opts.gainDb != null) {
 				await this.setGain(opts.gainDb);
 			}
@@ -325,9 +331,11 @@ export class RtlSdrClient extends EventEmitter {
 			await this.setGainMode(false);
 			await this.setGain(opts.gainDb);
 		}
+
 		if (opts.freqCorrectionPpm != null) {
 			await this.setFreqCorrection(opts.freqCorrectionPpm);
 		}
+
 		if (opts.biasTee != null) {
 			await this.setBiasTee(opts.biasTee);
 		}
