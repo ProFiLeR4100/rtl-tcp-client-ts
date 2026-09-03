@@ -1,3 +1,6 @@
+/**
+ * Публичный API библиотеки: точка входа для всех экспортов.
+ */
 export { RtlSdrClient } from './client';
 export type { RtlSdrClientOptions, ConfigureOptions } from './client';
 export {
@@ -7,6 +10,10 @@ export {
 	HANDSHAKE_MAGIC,
 	HANDSHAKE_SIZE,
 	COMMAND_SIZE,
+	MASK_BYTE,
+	MASK_WORD,
+	PARAM_MIN,
+	PARAM_MAX,
 	TUNER_NAMES
 } from './constants';
 export type { CommandId } from './constants';
