@@ -48,14 +48,19 @@ export interface RtlSdrClientOptions {
 export interface ConfigureOptions {
 	/** Center frequency, Hz. */
 	centerFrequency?: number;
+
 	/** Sample rate, Hz. */
 	sampleRate?: number;
+
 	/** Auto gain (AGC): true = enabled. */
 	autoGain?: boolean;
+
 	/** Manual gain, dB (applied when autoGain === false). */
 	gainDb?: number;
+
 	/** Frequency correction, PPM. */
 	freqCorrectionPpm?: number;
+
 	/** Bias-tee: true = enabled. */
 	biasTee?: boolean;
 }
@@ -68,9 +73,11 @@ export interface ConfigureOptions {
 export class RtlSdrClient extends EventEmitter {
 	private readonly _host: string;
 	private readonly _port: number;
+
 	/** 'samples' event chunk size in bytes (chunkSize pairs * 4). */
 	private readonly _chunkBytes: number;
 	private readonly _connectTimeoutMs: number;
+
 	/** Max receive buffer size in bytes (maxPendingSamples * 4). */
 	private readonly _maxPendingBytes: number;
 
