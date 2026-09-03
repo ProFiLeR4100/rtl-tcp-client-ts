@@ -27,8 +27,8 @@
 		"test:integration": "vitest run test/integration.test.ts",
 		"lint": "eslint .",
 		"lint:fix": "eslint . --fix",
-		"format": "prettier --write .",
-		"format:check": "prettier --check .",
+		"prettier": "prettier --write .",
+		"prettier:check": "prettier --check .",
 		"prepublishOnly": "npm run clean && npm run build"
 	},
 	"devDependencies": {

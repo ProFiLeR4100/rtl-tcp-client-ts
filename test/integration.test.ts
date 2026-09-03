@@ -61,7 +61,9 @@ describe(`integration: real rtl_tcp server @ ${HOST}:${PORT}`, () => {
 			let peak = 0;
 			for (let i = 0; i < first.length; i++) {
 				const a = Math.abs(first[i]);
-				if (a > peak) peak = a;
+				if (a > peak) {
+					peak = a;
+				}
 			}
 			console.log(`first chunk: ${first.length / 2} IQ samples, peak amplitude ${peak}`);
 			expect(

@@ -45,9 +45,13 @@ export function decodeIq(buffer: Buffer): Int16Array {
 	const usable = buffer.length & ~1; // round down to even
 	const n = usable >> 1;
 	const out = new Int16Array(n);
-	if (n === 0) return out;
+	if (n === 0) {
+		return out;
+	}
 	const dv = new DataView(buffer.buffer, buffer.byteOffset, usable);
-	for (let i = 0; i < n; i++) out[i] = dv.getInt16(i * 2, true);
+	for (let i = 0; i < n; i++) {
+		out[i] = dv.getInt16(i * 2, true);
+	}
 	return out;
 }
 
@@ -55,6 +59,8 @@ export function decodeIq(buffer: Buffer): Int16Array {
 export function encodeIq(int16: Int16Array): Buffer {
 	const buf = Buffer.allocUnsafe(int16.length * 2);
 	const dv = new DataView(buf.buffer, buf.byteOffset, buf.length);
-	for (let i = 0; i < int16.length; i++) dv.setInt16(i * 2, int16[i], true);
+	for (let i = 0; i < int16.length; i++) {
+		dv.setInt16(i * 2, int16[i], true);
+	}
 	return buf;
 }

@@ -63,8 +63,11 @@ export class MockRtlTcpServer {
 	close(): Promise<void> {
 		return new Promise((resolve) => {
 			this.socket?.destroy();
-			if (this.server) this.server.close(() => resolve());
-			else resolve();
+			if (this.server) {
+				this.server.close(() => resolve());
+			} else {
+				resolve();
+			}
 		});
 	}
 }

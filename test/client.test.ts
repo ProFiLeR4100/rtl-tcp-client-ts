@@ -80,7 +80,9 @@ describe('RtlSdrClient', () => {
 			const samplesP = nextEvent<Int16Array>(client, 'samples');
 			await client.connect();
 			const iq = new Int16Array(16);
-			for (let i = 0; i < 16; i++) iq[i] = i - 8;
+			for (let i = 0; i < 16; i++) {
+				iq[i] = i - 8;
+			}
 			server.sendIq(encodeIq(iq));
 			const got = await samplesP;
 			expect(Array.from(got)).toEqual(Array.from(iq));
@@ -96,12 +98,16 @@ describe('RtlSdrClient', () => {
 		const client = new RtlSdrClient({ port, chunkSize: 4 });
 		const collected: number[] = [];
 		client.on('samples', (iq: Int16Array) => {
-			for (let i = 0; i < iq.length; i++) collected.push(iq[i]);
+			for (let i = 0; i < iq.length; i++) {
+				collected.push(iq[i]);
+			}
 		});
 		try {
 			await client.connect();
 			const iq = new Int16Array(16);
-			for (let i = 0; i < 16; i++) iq[i] = i;
+			for (let i = 0; i < 16; i++) {
+				iq[i] = i;
+			}
 			const b = encodeIq(iq); // 32 bytes
 			server.sendIq(b.subarray(0, 5));
 			await tick(20);

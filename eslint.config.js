@@ -57,8 +57,13 @@ module.exports = tseslint.config(
 			'@typescript-eslint/no-explicit-any': 'off'
 		}
 	},
-	// Disable rules that conflict with Prettier
+	// Disable rules that conflict with Prettier.
+	// `curly` is re-enabled here: its own `rules` override the extended Prettier
+	// config, which otherwise disables `curly`.
 	{
-		extends: [eslintConfigPrettier]
+		extends: [eslintConfigPrettier],
+		rules: {
+			curly: ['error', 'all']
+		}
 	}
 );

@@ -1,4 +1,4 @@
-import { RtlSdrClient } from '../src/index';
+import { RtlSdrClient } from '../src';
 
 async function main(): Promise<void> {
 	const client = new RtlSdrClient({ host: '127.0.0.1', port: 1234, chunkSize: 8192 });
@@ -8,7 +8,9 @@ async function main(): Promise<void> {
 		let peak = 0;
 		for (let i = 0; i < iq.length; i++) {
 			const a = Math.abs(iq[i]);
-			if (a > peak) peak = a;
+			if (a > peak) {
+				peak = a;
+			}
 		}
 		process.stdout.write(`peak=${peak}\r`);
 	});

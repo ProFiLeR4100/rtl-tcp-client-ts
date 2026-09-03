@@ -6,10 +6,13 @@ import { type Handshake, decodeIq, encodeCommand, parseHandshake } from './proto
 export interface RtlSdrClientOptions {
 	host?: string;
 	port?: number;
+
 	/** Number of IQ samples included in each 'samples' event. Default 16384. */
 	chunkSize?: number;
+
 	/** Milliseconds for TCP connect / handshake before timing out. Default 5000. */
 	connectTimeoutMs?: number;
+
 	/** Max IQ samples buffered before dropping the oldest. Default 2_000_000. */
 	maxPendingSamples?: number;
 }
@@ -55,34 +58,44 @@ export class RtlSdrClient extends EventEmitter {
 	get connected(): boolean {
 		return this._state === 'stream';
 	}
+
 	get tunerType(): number | undefined {
 		return this._handshake?.tunerType;
 	}
+
 	get tunerGainCount(): number | undefined {
 		return this._handshake?.tunerGainCount;
 	}
+
 	get tunerName(): string | undefined {
 		return this._handshake ? (TUNER_NAMES[this._handshake.tunerType] ?? 'UNKNOWN') : undefined;
 	}
+
 	/** IQ samples currently buffered (not yet emitted). */
 	get bufferedSamples(): number {
 		return (this._rx.length >> 2) | 0;
 	}
+
 	get totalSamplesEmitted(): number {
 		return this._totalIq;
 	}
+
 	get droppedSamples(): number {
 		return this._totalDropped;
 	}
+
 	get lastError(): Error | undefined {
 		return this._lastError;
 	}
 
 	/** Connect to the server and complete the handshake. Resolves with the client. */
 	connect(): Promise<RtlSdrClient> {
-		if (this._state === 'stream') return Promise.resolve(this);
-		if (this._socket)
+		if (this._state === 'stream') {
+			return Promise.resolve(this);
+		}
+		if (this._socket) {
 			return Promise.reject(new Error('A connection is already in progress or established.'));
+		}
 
 		const socket = net.connect({
 			host: this._host,
@@ -129,85 +142,115 @@ export class RtlSdrClient extends EventEmitter {
 		this._checkInt(hz, 'center frequency');
 		return this._sendCommand(COMMANDS.CENTER_FREQUENCY, hz);
 	}
+
 	setSampleRate(hz: number): Promise<void> {
 		this._checkInt(hz, 'sample rate');
 		return this._sendCommand(COMMANDS.SAMPLE_RATE, hz);
 	}
+
 	setGainMode(auto: boolean): Promise<void> {
 		return this._sendCommand(COMMANDS.GAIN_MODE, auto ? 0 : 1);
 	}
+
 	setAutoGain(auto: boolean): Promise<void> {
 		return this.setGainMode(auto);
 	}
+
 	setGain(db: number): Promise<void> {
-		if (!Number.isFinite(db)) throw new TypeError('gain (dB) must be a finite number');
+		if (!Number.isFinite(db)) {
+			throw new TypeError('gain (dB) must be a finite number');
+		}
 		return this._sendCommand(COMMANDS.GAIN, Math.round(db * 10));
 	}
+
 	setFreqCorrection(ppm: number): Promise<void> {
 		this._checkInt(ppm, 'freq correction (ppm)');
 		return this._sendCommand(COMMANDS.FREQ_CORRECTION, ppm);
 	}
+
 	setTunerIfGain(ifGain: number, gain: number): Promise<void> {
 		const param = ((ifGain & 0xffff) << 16) | (gain & 0xffff);
 		return this._sendCommand(COMMANDS.TUNER_IF_GAIN, param);
 	}
+
 	setTestMode(on: boolean): Promise<void> {
 		return this._sendCommand(COMMANDS.TEST_MODE, on ? 1 : 0);
 	}
+
 	setAfcMode(on: boolean): Promise<void> {
 		return this._sendCommand(COMMANDS.AFC_MODE, on ? 1 : 0);
 	}
+
 	setDirectSampling(mode: 0 | 1 | 2): Promise<void> {
-		if (mode !== 0 && mode !== 1 && mode !== 2)
+		if (mode !== 0 && mode !== 1 && mode !== 2) {
 			throw new RangeError('direct sampling mode must be 0, 1 or 2');
+		}
 		return this._sendCommand(COMMANDS.DIRECT_SAMPLING, mode);
 	}
+
 	setOffsetTuning(on: boolean): Promise<void> {
 		return this._sendCommand(COMMANDS.OFFSET_TUNING, on ? 1 : 0);
 	}
+
 	setRtlXtal(hz: number): Promise<void> {
 		this._checkInt(hz, 'RTL xtal');
 		return this._sendCommand(COMMANDS.RTL_XTAL, hz);
 	}
+
 	setTunerXtal(hz: number): Promise<void> {
 		this._checkInt(hz, 'tuner xtal');
 		return this._sendCommand(COMMANDS.TUNER_XTAL, hz);
 	}
+
 	setGainByIndex(index: number): Promise<void> {
 		this._checkInt(index, 'gain index');
 		return this._sendCommand(COMMANDS.GAIN_BY_INDEX, index);
 	}
+
 	setBiasTee(on: boolean): Promise<void> {
 		return this._sendCommand(COMMANDS.BIAS_TEE, on ? 1 : 0);
 	}
 
 	/** Apply a group of settings sequentially. */
 	async configure(opts: ConfigureOptions): Promise<void> {
-		if (opts.centerFrequency != null) await this.setCenterFrequency(opts.centerFrequency);
-		if (opts.sampleRate != null) await this.setSampleRate(opts.sampleRate);
+		if (opts.centerFrequency != null) {
+			await this.setCenterFrequency(opts.centerFrequency);
+		}
+		if (opts.sampleRate != null) {
+			await this.setSampleRate(opts.sampleRate);
+		}
 		if (opts.autoGain != null) {
 			await this.setGainMode(opts.autoGain);
-			if (!opts.autoGain && opts.gainDb != null) await this.setGain(opts.gainDb);
+			if (!opts.autoGain && opts.gainDb != null) {
+				await this.setGain(opts.gainDb);
+			}
 		} else if (opts.gainDb != null) {
 			await this.setGainMode(false);
 			await this.setGain(opts.gainDb);
 		}
-		if (opts.freqCorrectionPpm != null) await this.setFreqCorrection(opts.freqCorrectionPpm);
-		if (opts.biasTee != null) await this.setBiasTee(opts.biasTee);
+		if (opts.freqCorrectionPpm != null) {
+			await this.setFreqCorrection(opts.freqCorrectionPpm);
+		}
+		if (opts.biasTee != null) {
+			await this.setBiasTee(opts.biasTee);
+		}
 	}
 
 	// ---- data ---------------------------------------------------------------
 	onSamples(cb: (iq: Int16Array) => void): this {
 		return this.on('samples', cb);
 	}
+
 	pause(): this {
 		this._socket?.pause();
 		return this;
 	}
+
 	resume(): this {
 		this._socket?.resume();
 		return this;
 	}
+
 	/** Emit any buffered (less than a full chunk) IQ samples now. */
 	flushSamples(): void {
 		if (this._rx.length >= 4) {
@@ -231,12 +274,14 @@ export class RtlSdrClient extends EventEmitter {
 		if (this._state === 'handshake') {
 			if (this._rx.length >= HANDSHAKE_SIZE) {
 				let handshake: Handshake;
+
 				try {
 					handshake = parseHandshake(this._rx.subarray(0, HANDSHAKE_SIZE));
 				} catch (err) {
 					this._failConnect(err instanceof Error ? err : new Error(String(err)));
 					return;
 				}
+
 				this._handshake = handshake;
 				this._rx = Buffer.from(this._rx.subarray(HANDSHAKE_SIZE));
 				this._state = 'stream';
@@ -247,10 +292,13 @@ export class RtlSdrClient extends EventEmitter {
 				this._emitLoop();
 				resolve?.(this);
 			}
+
 			return;
 		}
 
-		if (this._state === 'stream') this._emitLoop();
+		if (this._state === 'stream') {
+			this._emitLoop();
+		}
 	};
 
 	private _emitLoop(): void {
@@ -262,13 +310,17 @@ export class RtlSdrClient extends EventEmitter {
 			this._emitIq(data.subarray(offset, offset + cb));
 			offset += cb;
 		}
-		if (offset > 0) this._rx = Buffer.from(data.subarray(offset));
+		if (offset > 0) {
+			this._rx = Buffer.from(data.subarray(offset));
+		}
 	}
 
 	private _emitIq(slice: Buffer): void {
 		const iq = decodeIq(slice);
 		const pairs = (iq.length >> 1) | 0;
-		if (pairs > 0) this._totalIq += pairs;
+		if (pairs > 0) {
+			this._totalIq += pairs;
+		}
 		this.emit('samples', iq);
 	}
 
@@ -277,7 +329,9 @@ export class RtlSdrClient extends EventEmitter {
 		this._connectResolve = undefined;
 		this._connectReject = undefined;
 		this._lastError = err;
-		if (this.listenerCount('error') > 0) this.emit('error', err);
+		if (this.listenerCount('error') > 0) {
+			this.emit('error', err);
+		}
 		this._teardown();
 		reject?.(err);
 	}
@@ -289,7 +343,9 @@ export class RtlSdrClient extends EventEmitter {
 		}
 		this._finishPending(err);
 		this._lastError = err;
-		if (this.listenerCount('error') > 0) this.emit('error', err);
+		if (this.listenerCount('error') > 0) {
+			this.emit('error', err);
+		}
 		this._teardown();
 	};
 
@@ -313,11 +369,15 @@ export class RtlSdrClient extends EventEmitter {
 	private _teardown(): void {
 		const s = this._socket;
 		this._socket = undefined;
-		if (s && !s.destroyed) s.destroy();
+		if (s && !s.destroyed) {
+			s.destroy();
+		}
 	}
 
 	private _finishPending(err: Error): void {
-		for (const f of this._pendingCmds) f(err);
+		for (const f of this._pendingCmds) {
+			f(err);
+		}
 		this._pendingCmds.clear();
 	}
 
@@ -329,8 +389,11 @@ export class RtlSdrClient extends EventEmitter {
 		return new Promise<void>((resolve, reject) => {
 			const done = (e?: Error): void => {
 				this._pendingCmds.delete(done);
-				if (e) reject(e);
-				else resolve();
+				if (e) {
+					reject(e);
+				} else {
+					resolve();
+				}
 			};
 			this._pendingCmds.add(done);
 			socket.write(encodeCommand(cmd, param), (err) => done(err ?? undefined));
